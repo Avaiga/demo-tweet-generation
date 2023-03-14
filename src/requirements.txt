@@ -1,2 +1,2 @@
-fit+http://github.com/Avaiga/taipy.git
-tweety
+taipy
+openai

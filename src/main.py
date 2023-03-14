@@ -1,5 +1,3 @@
-"""Streamlit app to generate Tweets."""
-
 # Import from standard library
 import logging
 import random
@@ -9,12 +7,7 @@ import re
 from taipy.gui import Gui, notify
 
 # Import modules
-#import tweets as twe
 import oai
-
-# Configure logger
-logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.INFO, force=True)
-
 
 # Define functions
 def generate_text(state):
@@ -29,18 +22,15 @@ def generate_text(state):
     state.image = ""
     state.text_error = ""
 
-    if not state.topic:
+    if len(state.topic)==0:
         notify(state, "error", "Please enter a topic")
         return
 
     mood_prompt = f"{state.mood} " if state.mood else ""
-    if state.style:
-        #twitter = twe.Tweets(account=state.style)
-        #tweets = twitter.fetch_tweets()
-        #tweets_prompt = "\n\n".join(tweets)
+    if state.style and len(state.style)>0:
         prompt = (
             f"Write a {mood_prompt}Tweet about {state.topic} in less than 120 characters "
-            f"and in the style of the following Tweets:\n\n\n\n"
+            f"and with the style of {state.style}:\n\n\n\n"
         )
     else:
         prompt = f"Write a {mood_prompt}Tweet about {state.topic} in less than 120 characters:\n\n"
@@ -119,31 +109,31 @@ style = "elonmusk"
 image = None
 
 page = """
-<|part|class_name=container|
+<container|part|class_name=container|
 # **Generate**{: .color_primary} Tweets
 
-This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images. You can find the code on [GitHub](https://github.com/kinosal/tweet) and the author on [Twitter](https://twitter.com/kinosal).
+This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images. You can find the code on [GitHub](https://github.com/Avaiga/demo-tweet-generation) and the original author on [Twitter](https://twitter.com/kinosal).
 
 <br/>
 
 <|layout|columns=1 1 1|gap=30px|
-<|
+<topic|
 ## **Topic**{: .color_primary} (or hashtag)
 
 <|{topic}|input|label=Topic (or hashtag)|>
-|>
+|topic>
 
-<|
+<mood|
 ## **Mood**{: .color_primary}
 
 <|{mood}|input|label=Mood (e.g. inspirational, funny, serious) (optional)|>
-|>
+|mood>
 
-<|
+<style|
 ## Twitter **account**{: .color_primary}
 
 <|{style}|input|label=Twitter account handle to style-copy recent Tweets (optional)|>
-|>
+|style>
 |>
 
 <br/>
@@ -159,54 +149,34 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 ---
 
 <br/>
-<|part|class_name=card p1|
+<tweet_result|part|class_name=card p1|
 
 ### Generated **Tweet**{: .color_primary}
 
 <|{tweet}|input|multiline|label=Resulting tweet|>
-|>
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Tweet generated via" data-url="https://tweets.streamlit.app" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+|tweet_result>
 
-<|part|render={prompt!="" and tweet!=""}|class_name=card p1|
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Tweet generated via" data-url="https://127.0.0.1:4002" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<image|part|render={prompt!="" and tweet!=""}|class_name=card p1|
 ### **Image**{: .color_primary} from Dall-e
-
-<center><|{image}|image|height=400px|></center>
-|>
-
-<br/>
 
 <center><|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|></center>
 
+
+
+<center><|{image}|image|height=400px|></center>
+|image>
+
 <br/>
 
-<|layout|columns=1 1|
-<|
-**Other Streamlit apps by [@kinosal](https://twitter.com/kinosal)**
+**Code from [@kinosal](https://twitter.com/kinosal)**
 
-[Twitter Wrapped](https://twitter-likes.streamlit.app)
+Original code can be found [here](https://github.com/kinosal/tweet)
 
-[Content Summarizer](https://web-summarizer.streamlit.app)
-
-[Code Translator](https://english-to-code.streamlit.app)
-
-[PDF Analyzer](https://pdf-keywords.streamlit.app)
-|>
-
-<|
-If you like this app, please consider to
-
-<form action="https://www.paypal.com/donate" method="post" target="_top">
-<input type="hidden" name="hosted_button_id" value="8JJTGY95URQCQ" />
-<input type="image" src="https://pics.paypal.com/00/s/MDY0MzZhODAtNGI0MC00ZmU5LWI3ODYtZTY5YTcxOTNlMjRm/file.PNG" height="35" border="0" name="submit" title="Donate with PayPal" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-</form>
-
-so I can keep it alive. Thank you!
-
-|>
-|>
-|>
+|container>
 """
 
 
-Gui(page).run(host="0.0.0.0", port=4001)
+if __name__ == "__main__":
+    Gui(page).run(dark_mode=False)

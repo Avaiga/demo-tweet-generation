@@ -7,8 +7,10 @@ import logging
 # Import from 3rd party libraries
 import openai
 
+import os
+
 # Assign credentials from environment variable or streamlit secrets dict
-openai.api_key = "YOUR-KEY-HERE"
+openai.api_key = "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"
 
 # Suppress openai request/response logging
 # Handle by manually changing the respective APIRequestor methods in the openai package
