@@ -15,6 +15,7 @@ def generate_text(state):
     if state.n_requests >= 5:
         state.text_error = "Too many requests. Please wait a few seconds before generating another Tweet."
         logging.info(f"Session request limit reached: {state.n_requests}")
+        notify(state, "error", f"Session request limit reached: {state.n_requests}")
         state.n_requests = 1
         return
 
@@ -44,6 +45,7 @@ def generate_text(state):
     if flagged:
         state.text_error = "Input flagged as inappropriate."
         logging.info(f"Topic: {topic}{mood_output}{style_output}\n")
+        notify(state, "error", f"Input flagged as inappropriate.")
         return
 
     else:
@@ -73,7 +75,6 @@ def generate_image(state):
         "Create a detailed but brief description of an image that captures "
         f"the essence of the following text:\n{prompt_wo_hashtags}\n\n"
     )
-    print(processing_prompt)
     processed_prompt = (
         openai.complete(
             prompt=processing_prompt, temperature=0.5, max_tokens=40
@@ -83,7 +84,6 @@ def generate_image(state):
         .split(".")[0]
         + "."
     )
-    print(processed_prompt)
     state.n_requests += 1
     state.image = openai.image(processed_prompt)
     logging.info(f"Tweet: {state.prompt}\nImage prompt: {processed_prompt}")
@@ -97,6 +97,7 @@ def feeling_lucky(state):
     state.style = ""
     generate_text(state)
 
+# Variables
 tweet = ""
 prompt = ""
 image = ""
@@ -110,6 +111,8 @@ style = "elonmusk"
 
 image = None
 
+
+# Markdown for the entire page
 page = """
 # **Generate**{: .color_primary} Tweets
 
