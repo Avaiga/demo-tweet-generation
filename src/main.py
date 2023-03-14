@@ -73,6 +73,7 @@ def generate_image(state):
         "Create a detailed but brief description of an image that captures "
         f"the essence of the following text:\n{prompt_wo_hashtags}\n\n"
     )
+    print(processing_prompt)
     processed_prompt = (
         openai.complete(
             prompt=processing_prompt, temperature=0.5, max_tokens=40
@@ -82,6 +83,7 @@ def generate_image(state):
         .split(".")[0]
         + "."
     )
+    print(processed_prompt)
     state.n_requests += 1
     state.image = openai.image(processed_prompt)
     logging.info(f"Tweet: {state.prompt}\nImage prompt: {processed_prompt}")
@@ -109,7 +111,6 @@ style = "elonmusk"
 image = None
 
 page = """
-<container|part|class_name=container|
 # **Generate**{: .color_primary} Tweets
 
 This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images. You can find the code on [GitHub](https://github.com/Avaiga/demo-tweet-generation) and the original author on [Twitter](https://twitter.com/kinosal).
@@ -149,16 +150,14 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 ---
 
 <br/>
-<tweet_result|part|class_name=card p1|
 
 ### Generated **Tweet**{: .color_primary}
 
 <|{tweet}|input|multiline|label=Resulting tweet|>
-|tweet_result>
 
 <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Tweet generated via" data-url="https://127.0.0.1:4002" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<image|part|render={prompt!="" and tweet!=""}|class_name=card p1|
+<image|part|render={prompt != "" and tweet != ""}|
 ### **Image**{: .color_primary} from Dall-e
 
 <center><|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|></center>
@@ -173,8 +172,6 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 **Code from [@kinosal](https://twitter.com/kinosal)**
 
 Original code can be found [here](https://github.com/kinosal/tweet)
-
-|container>
 """
 
 
