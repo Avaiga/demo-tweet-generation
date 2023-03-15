@@ -9,87 +9,118 @@ from taipy.gui import Gui, notify
 # Import modules
 import oai
 
+# Configure logger
+logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.INFO, force=True)
+
+
+def error_prompt_flagged(state, prompt):
+    """Notify user that a prompt has been flagged."""
+    notify(state, "error", "Prompt flagged as inappropriate.")
+    logging.info(f"Prompt flagged as inappropriate: {prompt}")
+
+def error_too_many_requests(state):
+    """Notify user that too many requests have been made."""
+    notify(state, "error", "Too many requests. Please wait a few seconds before generating another text or image.")
+    logging.info(f"Session request limit reached: {state.n_requests}")
+    state.n_requests = 1
+
+
 # Define functions
 def generate_text(state):
     """Generate Tweet text."""
+    state.tweet = ""
+    state.image = None
+
+    # Check the number of requests done by the user
     if state.n_requests >= 5:
-        state.text_error = "Too many requests. Please wait a few seconds before generating another Tweet."
-        logging.info(f"Session request limit reached: {state.n_requests}")
-        notify(state, "error", f"Session request limit reached: {state.n_requests}")
-        state.n_requests = 1
+        error_too_many_requests(state)
         return
 
-    state.tweet = ""
-    state.image = ""
-    state.text_error = ""
-
-    if len(state.topic)==0:
+    # Check if the user has put a topic
+    if state.topic == "":
         notify(state, "error", "Please enter a topic")
         return
 
-    mood_prompt = f"{state.mood} " if state.mood else ""
-    if state.style and len(state.style)>0:
-        prompt = (
-            f"Write a {mood_prompt}Tweet about {state.topic} in less than 120 characters "
+    # Create the prompt and add a style or not
+    if state.style == "":
+        state.prompt = (
+            f"Write a {state.mood}Tweet about {state.topic} in less than 120 characters "
             f"and with the style of {state.style}:\n\n\n\n"
         )
     else:
-        prompt = f"Write a {mood_prompt}Tweet about {state.topic} in less than 120 characters:\n\n"
+        state.prompt = f"Write a {state.mood}Tweet about {state.topic} in less than 120 characters:\n\n"
 
-    state.prompt = prompt
 
+    # openai configured and check if text is flagged
     openai = oai.Openai()
-    flagged = openai.moderate(prompt)
-    mood_output = f", Mood: {state.mood}" if state.mood else ""
-    style_output = f", Style: {state.style}" if state.style else ""
+    flagged = openai.moderate(state.prompt)
+    
     if flagged:
-        state.text_error = "Input flagged as inappropriate."
-        logging.info(f"Topic: {topic}{mood_output}{style_output}\n")
-        notify(state, "error", f"Input flagged as inappropriate.")
+        error_prompt_flagged(state, f"Prompt: {state.prompt}\n")
         return
-
     else:
-        state.text_error = ""
+        # Generate the tweet
         state.n_requests += 1
         state.tweet = (
-            openai.complete(prompt).strip().replace('"', "")
+            openai.complete(state.prompt).strip().replace('"', "")
         )
+
+        # Notify the user in console and in the GUI
         logging.info(
-            f"Topic: {topic}{mood_output}{style_output}\n"
+            f"Topic: {state.prompt}{state.mood}{state.style}\n"
             f"Tweet: {state.tweet}"
         )
+        notify(state, "success", "Tweet created!")
 
 
 def generate_image(state):
     """Generate Tweet image."""
+    notify(state, "info", "Generating image...")
+
+    # Check the number of requests done by the user
     if state.n_requests >= 5:
-        notify(state, "error", "Too many requests. Please wait a few seconds before generating another text or image.")
-        logging.info(f"Session request limit reached: {state.n_requests}")
-        state.n_requests = 1
+        error_too_many_requests(state)
         return
 
+    state.image = None
 
-    openai = oai.Openai()
+    # Creates the prompt
     prompt_wo_hashtags = re.sub("#[A-Za-z0-9_]+", "", state.prompt)
     processing_prompt = (
         "Create a detailed but brief description of an image that captures "
         f"the essence of the following text:\n{prompt_wo_hashtags}\n\n"
     )
-    processed_prompt = (
-        openai.complete(
-            prompt=processing_prompt, temperature=0.5, max_tokens=40
+
+    # Openai configured and check if text is flagged
+    openai = oai.Openai()
+    flagged = openai.moderate(processing_prompt)
+
+    if flagged:
+        error_prompt_flagged(state, processing_prompt)
+        return
+    else:
+        state.n_requests += 1
+        # Generate the prompt that will create the image
+        processed_prompt = (
+            openai.complete(
+                prompt=processing_prompt, temperature=0.5, max_tokens=40
+            )
+            .strip()
+            .replace('"', "")
+            .split(".")[0]
+            + "."
         )
-        .strip()
-        .replace('"', "")
-        .split(".")[0]
-        + "."
-    )
-    state.n_requests += 1
-    state.image = openai.image(processed_prompt)
-    logging.info(f"Tweet: {state.prompt}\nImage prompt: {processed_prompt}")
+
+        # Generate the image
+        state.image = openai.image(processed_prompt)
+
+        # Notify the user in console and in the GUI
+        logging.info(f"Tweet: {state.prompt}\nImage prompt: {processed_prompt}")
+        notify(state, "success", f"Image created!")
 
 
 def feeling_lucky(state):
+    """Generate a feeling-lucky tweet."""
     with open("moods.txt") as f:
         sample_moods = f.read().splitlines()
     state.topic = "an interesting topic"
@@ -100,9 +131,6 @@ def feeling_lucky(state):
 # Variables
 tweet = ""
 prompt = ""
-image = ""
-text_error = ""
-image_error = ""
 n_requests = 0
 
 topic = "AI"
@@ -113,6 +141,11 @@ image = None
 
 
 # Markdown for the entire page
+## NOTE: {: .orange} references a color from main.css use to style my text
+## <text|
+## |text> 
+## "text" here is just a name given to my part/my section
+## it has no meaning in the code
 page = """
 # **Generate**{: .orange} Tweets
 
@@ -160,12 +193,10 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 
 <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Tweet generated via" data-url="https://127.0.0.1:4002" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<image|part|render={prompt != "" and tweet != ""}|
-### **Image**{: .orange} from Dall-e
-
 <center><|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|></center>
 
-
+<image|part|render={prompt != "" and tweet != "" and image is not None}|
+### **Image**{: .orange} from Dall-e
 
 <center><|{image}|image|height=400px|></center>
 |image>
