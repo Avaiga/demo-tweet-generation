@@ -16,9 +16,9 @@ The logic and idea as well as part of the code of this application comes from Ni
 
 ## What is demo Sales Dashboard
 
-[Demo Tweet Generation](https://github.com/Avaiga/demo-tweet-generation), powered by Taipy technology (available at https://taipy.io/), enables users to create unique Tweets using cutting-edge AI models from OpenAI: GPT-3's Davinci engine for generating text and DALL·E for generating images.
+[Demo Tweet Generation](https://github.com/Avaiga/demo-tweet-generation), powered by [Taipy](https://taipy.io/), enables users to create unique Tweets using cutting-edge AI models from OpenAI: GPT-3's Davinci engine for generating text and DALL·E for generating images.
 
-Users can enter a topic, an optional mood parameter, and a Twitter account for "style-transfer" in a text prompt creation form. The application then generates an instruction to write a Tweet based on the given input and sends the prompt to the OpenAI API. The GPT-3 Davinci engine predicts the next likely word tokens based on its extensive training on public text data, resulting in the generation of a Tweet.
+Users can enter a topic, an optional mood parameter, and a Twitter account in a text prompt creation form. The application then generates an instruction to write a Tweet based on the given input and sends the prompt to the OpenAI API. The GPT-3 Davinci engine predicts the next likely word tokens based on its extensive training on public text data, resulting in the generation of a Tweet.
 
 Moreover, the application can request and display an image from DALL·E, OpenAI's AI image creation model, using the generated Tweet text as input. This integration creates a unique Tweet that combines both text and image, providing an exciting way to generate content for social media platforms.
 
