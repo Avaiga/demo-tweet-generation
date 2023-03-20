@@ -13,7 +13,7 @@
 
 The logic and idea, as well as part of the code of this application, come from Nikolas Schriefer. The original code can be found [here](https://github.com/kinosal/tweet). It was recreated using Taipy.
 
-## What is demo Sales Dashboard
+## What is Demo Tweet Generation
 
 [Demo Tweet Generation](https://github.com/Avaiga/demo-tweet-generation), powered by [Taipy](https://taipy.io/), enables users to create unique Tweets using cutting-edge AI models from OpenAI: GPT-3's Davinci engine for generating text and DALL·E for generating images.
 
