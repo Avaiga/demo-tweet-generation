@@ -10,7 +10,7 @@ import openai
 import os
 
 # Assign credentials from environment variable or streamlit secrets dict
-openai.api_key = "KEY-HERE"
+openai.api_key = "Enter your token here"
 
 # Suppress openai request/response logging
 # Handle by manually changing the respective APIRequestor methods in the openai package

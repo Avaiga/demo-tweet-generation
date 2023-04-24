@@ -139,46 +139,47 @@ style = "elonmusk"
 
 image = None
 
+# Called whever there is a problem
+def on_exception(state, function_name: str, ex: Exception):
+    logging.error(f"Problem {ex} \nin {function_name}")
+    notify(state, 'error', f"Problem {ex} \nin {function_name}")
+
 
 # Markdown for the entire page
-## NOTE: {: .orange} references a color from main.css use to style my text
 ## <text|
 ## |text> 
 ## "text" here is just a name given to my part/my section
 ## it has no meaning in the code
 page = """
-# **Generate**{: .orange} Tweets
+<|container|
+# **Generate**{: .color-primary} Tweets
 
 This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images. You can find the code on [GitHub](https://github.com/Avaiga/demo-tweet-generation) and the original author on [Twitter](https://twitter.com/kinosal).
 
 <br/>
 
-<|layout|columns=1 1 1|gap=30px|
+<|layout|columns=1 1 1|gap=30px|class_name=card|
 <topic|
-## **Topic**{: .orange} (or hashtag)
+## **Topic**{: .color-primary} (or hashtag)
 
 <|{topic}|input|label=Topic (or hashtag)|>
 |topic>
 
 <mood|
-## **Mood**{: .orange}
+## **Mood**{: .color-primary}
 
 <|{mood}|input|label=Mood (e.g. inspirational, funny, serious) (optional)|>
 |mood>
 
 <style|
-## Twitter **account**{: .orange}
+## Twitter **account**{: .color-primary}
 
 <|{style}|input|label=Twitter account handle to style-copy recent Tweets (optional)|>
 |style>
-|>
 
-<br/>
+<|Generate text|button|on_action=generate_text|label=Generate text|>
 
-<|layout|columns=1 1|
-<center> <|Generate text|button|on_action=generate_text|label=Generate text|> </center>
-
-<center> <|Feeling lucky|button|on_action=feeling_lucky|label=Feeling Lucky|> </center>
+<|Feeling lucky|button|on_action=feeling_lucky|label=Feeling Lucky|>
 |>
 
 <br/>
@@ -187,16 +188,14 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 
 <br/>
 
-### Generated **Tweet**{: .orange}
+### Generated **Tweet**{: .color-primary}
 
-<|{tweet}|input|multiline|label=Resulting tweet|>
-
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Tweet generated via" data-url="https://127.0.0.1:4002" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<|{tweet}|input|multiline|label=Resulting tweet|class_name=fullwidth|>
 
 <center><|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|></center>
 
-<image|part|render={prompt != "" and tweet != "" and image is not None}|
-### **Image**{: .orange} from Dall-e
+<image|part|render={prompt != "" and tweet != "" and image is not None}|class_name=card|
+### **Image**{: .color-primary} from Dall-e
 
 <center><|{image}|image|height=400px|></center>
 |image>
@@ -206,8 +205,9 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 **Code from [@kinosal](https://twitter.com/kinosal)**
 
 Original code can be found [here](https://github.com/kinosal/tweet)
+|>
 """
 
 
 if __name__ == "__main__":
-    Gui(page).run(dark_mode=False)
+    Gui(page).run(dark_mode=False, port=5089)

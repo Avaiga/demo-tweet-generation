@@ -1,2 +1,2 @@
-taipy
+taipy==2.2
 openai
