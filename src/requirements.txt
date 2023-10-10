@@ -1,2 +1,2 @@
-taipy==2.2
+taipy==3.0.0.dev3
 openai

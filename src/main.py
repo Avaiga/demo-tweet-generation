@@ -119,14 +119,7 @@ def generate_image(state):
         notify(state, "success", f"Image created!")
 
 
-def feeling_lucky(state):
-    """Generate a feeling-lucky tweet."""
-    with open("moods.txt") as f:
-        sample_moods = f.read().splitlines()
-    state.topic = "an interesting topic"
-    state.mood = random.choice(sample_moods)
-    state.style = ""
-    generate_text(state)
+
 
 # Variables
 tweet = ""
@@ -178,8 +171,6 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 |style>
 
 <|Generate text|button|on_action=generate_text|label=Generate text|>
-
-<|Feeling lucky|button|on_action=feeling_lucky|label=Feeling Lucky|>
 |>
 
 <br/>
