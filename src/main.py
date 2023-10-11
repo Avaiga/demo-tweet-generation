@@ -201,4 +201,4 @@ Original code can be found [here](https://github.com/kinosal/tweet)
 
 
 if __name__ == "__main__":
-    Gui(page).run(dark_mode=False, port=5089)
+    Gui(page).run(title='Tweet Generation')
