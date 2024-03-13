@@ -9,7 +9,7 @@ import openai
 from openai import OpenAI
 
 
-api_key = "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"
+api_key = os.getenv("OPENAI_API_KEY")
 
 # Assign credentials from environment variable or streamlit secrets dict
 client = OpenAI(
