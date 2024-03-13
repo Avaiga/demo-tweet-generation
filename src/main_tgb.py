@@ -5,6 +5,7 @@ import re
 
 # Import from 3rd party libraries
 from taipy.gui import Gui, notify
+import taipy.gui.builder as tgb
 
 # Import modules
 import oai
@@ -61,6 +62,7 @@ def generate_text(state):
     else:
         # Generate the tweet
         state.n_requests += 1
+        print("Hello")
         state.tweet = (
             openai.complete(state.prompt).strip().replace('"', "")
         )
@@ -103,7 +105,7 @@ def generate_image(state):
         # Generate the prompt that will create the image
         processed_prompt = (
             openai.complete(
-                prompt=processing_prompt, temperature=0.5, max_tokens=40
+                prompt=processing_prompt
             )
             .strip()
             .replace('"', "")
@@ -138,67 +140,44 @@ def on_exception(state, function_name: str, ex: Exception):
     notify(state, 'error', f"Problem {ex} \nin {function_name}")
 
 
-# Markdown for the entire page
-## <text|
-## |text> 
-## "text" here is just a name given to my part/my section
-## it has no meaning in the code
-page = """
-<|container|
-# **Generate**{: .color-primary} Tweets
+with tgb.Page() as page:
+    with tgb.part("container"):
+        tgb.text("Tweet Generation", class_name="h1")
+        tgb.text("This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images.", mode="md")
 
-This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images. You can find the code on [GitHub](https://github.com/Avaiga/demo-tweet-generation) and the original author on [Twitter](https://twitter.com/kinosal).
+        tgb.html("br")
 
-<br/>
+        with tgb.layout(columns="1 1 1", gap="30px", class_name="card"):
+            with tgb.part():
+                tgb.text("Topic (or hashtag)", class_name="h2")
+                tgb.input("{topic}", label="Topic (or hashtag)")
+            with tgb.part():
+                tgb.text("Mood", class_name="h2")
+                tgb.input("{mood}", label="Mood (e.g. inspirational, funny, serious) (optional)")
+            with tgb.part():
+                tgb.text("Twitter account", class_name="h2")
+                tgb.input("{style}", label="Twitter account handle to style-copy recent Tweets (optional)")
 
-<|layout|columns=1 1 1|gap=30px|class_name=card|
-<topic|
-## **Topic**{: .color-primary} (or hashtag)
+            tgb.button("Generate", on_action=generate_text)
 
-<|{topic}|input|label=Topic (or hashtag)|>
-|topic>
+        tgb.html("br")
+        tgb.html("hr")
+        tgb.html("br")
 
-<mood|
-## **Mood**{: .color-primary}
+        tgb.text("Generated Tweets", class_name="h2")
+        tgb.input("{tweet}", multiline=True, label="Resulting tweet", class_name="fullwidth")
 
-<|{mood}|input|label=Mood (e.g. inspirational, funny, serious) (optional)|>
-|mood>
+        tgb.button("Generate image", on_action=generate_image, active="{prompt != '' and tweet != ''}", class_name="text-center text_center center")
 
-<style|
-## Twitter **account**{: .color-primary}
+        with tgb.part(render="{prompt != '' and tweet != '' and image is not None}", class_name="card text-center"):
+            tgb.text("Image from Dall-e", class_name="h2")
+            tgb.image("{image}", height="400px", class_name="text-center text_center")
 
-<|{style}|input|label=Twitter account handle to style-copy recent Tweets (optional)|>
-|style>
+        tgb.html("br")
 
-<|Generate text|button|on_action=generate_text|label=Generate text|>
-|>
-
-<br/>
-
----
-
-<br/>
-
-### Generated **Tweet**{: .color-primary}
-
-<|{tweet}|input|multiline|label=Resulting tweet|class_name=fullwidth|>
-
-<center><|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|></center>
-
-<image|part|render={prompt != "" and tweet != "" and image is not None}|class_name=card|
-### **Image**{: .color-primary} from Dall-e
-
-<center><|{image}|image|height=400px|></center>
-|image>
-
-<br/>
-
-**Code from [@kinosal](https://twitter.com/kinosal)**
-
-Original code can be found [here](https://github.com/kinosal/tweet)
-|>
-"""
+        tgb.text("Code from [@kinosal](https://twitter.com/kinosal)", mode="md")
+        tgb.text("Original code can be found [here](https://github.com/kinosal/tweet)", mode="md")
 
 
 if __name__ == "__main__":
-    Gui(page).run(title='Tweet Generation')
+    Gui(page).run(title='Tweet Generation', port=3455)

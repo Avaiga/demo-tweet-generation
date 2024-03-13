@@ -6,17 +6,16 @@ import logging
 
 # Import from 3rd party libraries
 import openai
+from openai import OpenAI
 
-import os
+
+api_key = "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"
 
 # Assign credentials from environment variable or streamlit secrets dict
-openai.api_key = "Enter your token here"
-
-# Suppress openai request/response logging
-# Handle by manually changing the respective APIRequestor methods in the openai package
-# Does not work hosted on Streamlit since all packages are re-installed by Poetry
-# Alternatively (affects all messages from this logger):
-logging.getLogger("openai").setLevel(logging.WARNING)
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=api_key,
+)
 
 
 class Openai:
@@ -30,31 +29,27 @@ class Openai:
         Return: boolean if flagged
         """
         try:
-            response = openai.Moderation.create(prompt)
-            return response["results"][0]["flagged"]
+            response = client.moderations.create(input=prompt)
+            return response.results[0].flagged
 
         except Exception as e:
             logging.error(f"OpenAI API error: {e}")
 
     @staticmethod
-    def complete(prompt: str, temperature: float = 0.9, max_tokens: int = 50) -> str:
+    def complete(prompt: str) -> str:
         """Call OpenAI GPT Completion with text prompt.
         Args:
             prompt: text prompt
         Return: predicted response text
         """
-        kwargs = {
-            "engine": "text-davinci-003",
-            "prompt": prompt,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-            "top_p": 1,  # default
-            "frequency_penalty": 0,  # default,
-            "presence_penalty": 0,  # default
-        }
         try:
-            response = openai.Completion.create(**kwargs)
-            return response["choices"][0]["text"]
+            response = client.chat.completions.create(
+                messages=[
+                    {"role": "user", "content": prompt},
+                ],
+                model="gpt-3.5-turbo"
+            )
+            return response.choices[0].message.content
 
         except Exception as e:
             logging.error(f"OpenAI API error: {e}")
@@ -67,13 +62,13 @@ class Openai:
         Return: image url
         """
         try:
-            response = openai.Image.create(
+            response = client.images.generate(
                 prompt=prompt,
                 n=1,
                 size="512x512",
                 response_format="url",
             )
-            return response["data"][0]["url"]
+            return response.data[0].url
 
         except Exception as e:
             logging.error(f"OpenAI API error: {e}")
