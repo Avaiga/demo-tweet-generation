@@ -120,6 +120,12 @@ def generate_image(state):
         notify(state, "success", f"Image created!")
 
 
+# Called whever there is a problem
+def on_exception(state, function_name: str, ex: Exception):
+    logging.error(f"Problem {ex} \nin {function_name}")
+    notify(state, 'error', f"Problem {ex} \nin {function_name}")
+
+
 if __name__ == "__main__":
     # Variables
     tweet = ""
@@ -131,12 +137,6 @@ if __name__ == "__main__":
     style = "elonmusk"
 
     image = None
-
-    # Called whever there is a problem
-    def on_exception(state, function_name: str, ex: Exception):
-        logging.error(f"Problem {ex} \nin {function_name}")
-        notify(state, 'error', f"Problem {ex} \nin {function_name}")
-
 
     # Markdown for the entire page
     ## <text|
