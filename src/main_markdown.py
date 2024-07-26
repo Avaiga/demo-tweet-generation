@@ -120,31 +120,30 @@ def generate_image(state):
         notify(state, "success", f"Image created!")
 
 
+if __name__ == "__main__":
+    # Variables
+    tweet = ""
+    prompt = ""
+    n_requests = 0
+
+    topic = "AI"
+    mood = "inspirational"
+    style = "elonmusk"
+
+    image = None
+
+    # Called whever there is a problem
+    def on_exception(state, function_name: str, ex: Exception):
+        logging.error(f"Problem {ex} \nin {function_name}")
+        notify(state, 'error', f"Problem {ex} \nin {function_name}")
 
 
-# Variables
-tweet = ""
-prompt = ""
-n_requests = 0
-
-topic = "AI"
-mood = "inspirational"
-style = "elonmusk"
-
-image = None
-
-# Called whever there is a problem
-def on_exception(state, function_name: str, ex: Exception):
-    logging.error(f"Problem {ex} \nin {function_name}")
-    notify(state, 'error', f"Problem {ex} \nin {function_name}")
-
-
-# Markdown for the entire page
-## <text|
-## |text> 
-## "text" here is just a name given to my part/my section
-## it has no meaning in the code
-page = """
+    # Markdown for the entire page
+    ## <text|
+    ## |text> 
+    ## "text" here is just a name given to my part/my section
+    ## it has no meaning in the code
+    page = """
 <|container|
 # **Tweet**{: .color-primary} Generation
 
@@ -198,8 +197,6 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 
 Original code can be found [here](https://github.com/kinosal/tweet)
 |>
-"""
+    """
 
-
-if __name__ == "__main__":
     Gui(page).run(title='Tweet Generation', debug=True, port=2436)
