@@ -121,57 +121,55 @@ def generate_image(state):
         notify(state, "success", f"Image created!")
 
 
-
-
-# Variables
-tweet = ""
-prompt = ""
-n_requests = 0
-
-topic = "AI"
-mood = "inspirational"
-style = "elonmusk"
-
-image = None
-
 # Called whever there is a problem
 def on_exception(state, function_name: str, ex: Exception):
     logging.error(f"Problem {ex} \nin {function_name}")
     notify(state, 'error', f"Problem {ex} \nin {function_name}")
 
 
-with tgb.Page() as page:
-    with tgb.part("container"):
-        tgb.text("# Tweet Generation", mode="md")
-        tgb.text("This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images.", mode="md")
-
-        with tgb.layout(columns="1 1 1", gap="30px", class_name="card"):
-            with tgb.part():
-                tgb.text("## Topic (or hashtag)", mode="md")
-                tgb.input("{topic}", label="Topic (or hashtag)")
-            with tgb.part():
-                tgb.text("## Mood", mode="md")
-                tgb.input("{mood}", label="Mood (e.g. inspirational, funny, serious) (optional)")
-            with tgb.part():
-                tgb.text("## Twitter account", mode="md")
-                tgb.input("{style}", label="Twitter account handle to style-copy recent Tweets (optional)")
-
-            tgb.button("Generate", on_action=generate_text)
-
-        tgb.html("hr")
-
-        tgb.text("## Generated Tweets", mode="md")
-        tgb.input("{tweet}", multiline=True, label="Resulting tweet", class_name="fullwidth")
-
-        tgb.button("Generate image", on_action=generate_image, active="{prompt != '' and tweet != ''}", class_name="text-center text_center center")
-
-        with tgb.part(render="{prompt != '' and tweet != '' and image is not None}", class_name="card text-center"):
-            tgb.text("## Image from Dall-e", mode="md")
-            tgb.image("{image}", height="400px")
-
-        tgb.text("Code from [@kinosal](https://twitter.com/kinosal)", mode="md")
-        tgb.text("Original code can be found [here](https://github.com/kinosal/tweet)", mode="md")
-
-
 if __name__ == "__main__":
+    # Variables
+    tweet = ""
+    prompt = ""
+    n_requests = 0
+
+    topic = "AI"
+    mood = "inspirational"
+    style = "elonmusk"
+
+    image = None
+
+
+    with tgb.Page() as page:
+        with tgb.part("container"):
+            tgb.text("# Tweet Generation", mode="md")
+            tgb.text("This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images.", mode="md")
+
+            with tgb.layout(columns="1 1 1", gap="30px", class_name="card"):
+                with tgb.part():
+                    tgb.text("## Topic (or hashtag)", mode="md")
+                    tgb.input("{topic}", label="Topic (or hashtag)")
+                with tgb.part():
+                    tgb.text("## Mood", mode="md")
+                    tgb.input("{mood}", label="Mood (e.g. inspirational, funny, serious) (optional)")
+                with tgb.part():
+                    tgb.text("## Twitter account", mode="md")
+                    tgb.input("{style}", label="Twitter account handle to style-copy recent Tweets (optional)")
+
+                tgb.button("Generate", on_action=generate_text)
+
+            tgb.html("hr")
+
+            tgb.text("## Generated Tweets", mode="md")
+            tgb.input("{tweet}", multiline=True, label="Resulting tweet", class_name="fullwidth")
+
+            tgb.button("Generate image", on_action=generate_image, active="{prompt != '' and tweet != ''}", class_name="text-center text_center center")
+
+            with tgb.part(render="{prompt != '' and tweet != '' and image is not None}", class_name="card text-center"):
+                tgb.text("## Image from Dall-e", mode="md")
+                tgb.image("{image}", height="400px")
+
+            tgb.text("Code from [@kinosal](https://twitter.com/kinosal)", mode="md")
+            tgb.text("Original code can be found [here](https://github.com/kinosal/tweet)", mode="md")
+
     Gui(page).run(title='Tweet Generation', port=3455)
