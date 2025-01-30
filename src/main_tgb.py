@@ -141,6 +141,7 @@ if __name__ == "__main__":
 
 
     with tgb.Page() as page:
+        tgb.toggle(theme=True)
         with tgb.part("container"):
             tgb.text("# Tweet Generation", mode="md")
             tgb.text("This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https://beta.openai.com/docs/models/overview) for texts and [DALL·E](https://beta.openai.com/docs/guides/images) for images.", mode="md")
@@ -163,13 +164,13 @@ if __name__ == "__main__":
             tgb.text("## Generated Tweets", mode="md")
             tgb.input("{tweet}", multiline=True, label="Resulting tweet", class_name="fullwidth")
 
-            tgb.button("Generate image", on_action=generate_image, active="{prompt != '' and tweet != ''}", class_name="text-center text_center center")
+            tgb.button("Generate image", on_action=generate_image, active=lambda prompt, tweet: prompt != '' and tweet != '', class_name="text-center text_center center")
 
-            with tgb.part(render="{prompt != '' and tweet != '' and image is not None}", class_name="card text-center"):
+            with tgb.part(render=lambda prompt, tweet, image: prompt != '' and tweet != '' and image is not None, class_name="card text-center"):
                 tgb.text("## Image from Dall-e", mode="md")
                 tgb.image("{image}", height="400px")
 
             tgb.text("Code from [@kinosal](https://twitter.com/kinosal)", mode="md")
             tgb.text("Original code can be found [here](https://github.com/kinosal/tweet)", mode="md")
 
-    Gui(page).run(title='Tweet Generation', port=3455)
+    Gui(page).run(title='Tweet Generation', port=3455, dark_mode=True)

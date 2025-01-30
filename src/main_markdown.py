@@ -144,6 +144,7 @@ if __name__ == "__main__":
     ## "text" here is just a name given to my part/my section
     ## it has no meaning in the code
     page = """
+<|toggle|theme|>
 <|container|
 # **Tweet**{: .color-primary} Generation
 
@@ -183,12 +184,16 @@ This mini-app generates Tweets using OpenAI's GPT-3 based [Davinci model](https:
 
 <|{tweet}|input|multiline|label=Resulting tweet|class_name=fullwidth|>
 
-<center><|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|></center>
+<center>
+<|Generate image|button|on_action=generate_image|label=Generate image|active={prompt!="" and tweet!=""}|>
+</center>
 
 <image|part|render={prompt != "" and tweet != "" and image is not None}|class_name=card|
 ### **Image**{: .color-primary} from Dall-e
 
-<center><|{image}|image|height=400px|></center>
+<center>
+<|{image}|image|height=400px|>
+</center>
 |image>
 
 <br/>
@@ -199,4 +204,4 @@ Original code can be found [here](https://github.com/kinosal/tweet)
 |>
     """
 
-    Gui(page).run(title='Tweet Generation', debug=True, port=2436)
+    Gui(page).run(title='Tweet Generation', debug=True, port=2436, dark_mode=True)
